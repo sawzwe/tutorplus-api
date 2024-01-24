@@ -20,42 +20,55 @@ export async function GET(req: NextRequest, res: NextResponse) {
   }
 }
 
+// export async function POST(req: NextRequest, res: NextResponse) {
+//     try {
+//       await connectMongoDB();
+  
+//       const bodyText = await req.text();
+//       const body = JSON.parse(bodyText);
+  
+//       // Extract user data from the parsed body
+//       const {
+//         username,
+//         email,
+//         password,
+//         role,
+//         interests,
+//         profile,
+//         tutorDetails,
+//         studentDetails,
+//       } = body;
+  
+//       // Create a new user using the IUser interface
+//       const newUser: IUser = new User({
+//         username,
+//         email,
+//         password,
+//         role,
+//         interests,
+//         profile,
+//         tutorDetails,
+//         studentDetails,
+//       });
+  
+//       await newUser.save();
+  
+//       return new NextResponse(JSON.stringify({ message: "User created successfully" }), { status: 201 });
+//     } catch (error) {
+//       console.error("Error:", error);
+//       return new NextResponse(JSON.stringify({ error: "Failed to create user" }), { status: 500 });
+//     }
+//   }
+
 export async function POST(req: NextRequest, res: NextResponse) {
-    try {
+  try {
       await connectMongoDB();
-  
-      const bodyText = await req.text();
-      const body = JSON.parse(bodyText);
-  
-      // Extract user data from the parsed body
-      const {
-        username,
-        email,
-        password,
-        role,
-        interests,
-        profile,
-        tutorDetails,
-        studentDetails,
-      } = body;
-  
-      // Create a new user using the IUser interface
-      const newUser: IUser = new User({
-        username,
-        email,
-        password,
-        role,
-        interests,
-        profile,
-        tutorDetails,
-        studentDetails,
-      });
-  
+      const body = JSON.parse(await req.text());
+      const newUser = new User(body) as IUser;
       await newUser.save();
-  
-      return new NextResponse(JSON.stringify({ message: "User created successfully" }), { status: 201 });
-    } catch (error) {
+      return NextResponse.json({ message: "User created successfully" }, { status: 201 });
+  } catch (error) {
       console.error("Error:", error);
-      return new NextResponse(JSON.stringify({ error: "Failed to create user" }), { status: 500 });
-    }
+      return NextResponse.json({ error: "Failed to create user" }, { status: 500 });
   }
+}
