@@ -1,7 +1,8 @@
 import connectMongoDB from "@/libs/mongodb";
 import User from "@/models/User";
 import { NextResponse, NextRequest } from "next/server";
-import IUser from "@/types";
+import {IUser} from "@/types";
+
 
 export async function GET(req: NextRequest, res: NextResponse) {
   try {
