@@ -4,7 +4,6 @@ import mongoose, { Document } from 'mongoose';
 interface IUser extends Document {
   username: string;
   email: string;
-  password: string;
   role: 'student' | 'tutor';
   interests: Record<string, any>; // Adjust the type as per your data structure
   profile: {

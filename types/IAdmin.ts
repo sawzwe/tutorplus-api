@@ -4,7 +4,6 @@ interface IAdmin extends Document {
   username: string;
   email: string;
   role: 'admin';
-  password: string;
   profile: {
     firstName?: string;
     lastName?: string;

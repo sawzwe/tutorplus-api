@@ -3,25 +3,18 @@ import Admin from "@/models/Admin";
 import { NextResponse, NextRequest } from "next/server";
 import { IAdmin } from "@/types";
 
+
 export async function GET(req: NextRequest, res: NextResponse) {
   try {
     await connectMongoDB();
-    const admins = await Admin.find();
-
-    if (admins.length === 0) {
+    const admin = await Admin.find();
+    if (admin.length === 0) {
       return NextResponse.json({ message: "No admins found" }, { status: 404 });
     }
-
-    return NextResponse.json(
-      { admins, message: "Admins fetched successfully" },
-      { status: 200 }
-    );
+    return NextResponse.json(admin, { status: 200 });
   } catch (error) {
     console.error("Error:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch admins" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to fetch admins" }, { status: 500 });
   }
 }
 
