@@ -18,7 +18,8 @@ export default function Home() {
     async function fetchUsers() {
       try {
         const response = await axios.get("/api/users");
-        setUsers(response.data.users); // Assuming the response structure contains a "users" property
+        setUsers(response.data); 
+        // console.log(response.data)
       } catch (error) {
         console.error("Error fetching users:", error);
       }
@@ -28,11 +29,13 @@ export default function Home() {
     fetchUsers();
   }, []);
 
+  console.log(users)
+
   return (
     <div>
       <h1>List of Users</h1>
       <ul>
-        {users.map((user) => (
+        {users?.map((user) => (
           <li key={user._id}>
             {user.username} - {user.email}
           </li>
