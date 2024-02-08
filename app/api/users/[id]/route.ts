@@ -8,7 +8,7 @@ export async function GET(req : NextRequest,{ params }: { params: { id: number }
   try {
     await connectMongoDB();
 
-    const user = await User.findOne({ _id: id });
+    const user = await User.findOne({ username: id });
     return NextResponse.json({ user, message: "User fetched successfully" }, { status: 200 });
   } catch (error) {
     console.error("Error:", error);
