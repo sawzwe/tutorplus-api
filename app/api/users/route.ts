@@ -1,78 +1,60 @@
 import connectMongoDB from "@/libs/mongodb";
 import User from "@/models/User";
-import { NextResponse, NextRequest } from "next/server";
-import {IUser} from "@/types";
+import { NextRequest, NextResponse } from "next/server";
+import { IUser } from "@/types";
 
-
-// Define the CORS headers with an index signature
-const headers: { [key: string]: string } = {
+// Define the CORS headers
+const corsHeaders = {
   'Access-Control-Allow-Credentials': 'true',
-  'Access-Control-Allow-Origin': '*', // Adjust this to your client's URL for better security
-  'Access-Control-Allow-Methods': 'GET,OPTIONS',
+  'Access-Control-Allow-Origin': '*', // Adjust this to match your client's URL for better security
+  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
   'Access-Control-Allow-Headers': 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version',
 };
 
-
-export function middleware(req: NextRequest) {
-  // If the request method is OPTIONS, return a simple response with the CORS headers
-  if (req.method === 'OPTIONS') {
-    return new Response('OK', { headers });
-  }
+function setCorsHeaders(response: NextResponse) {
+  Object.entries(corsHeaders).forEach(([key, value]) => {
+    response.headers.set(key, value);
+  });
 }
 
 export async function GET(req: NextRequest) {
+  let response: NextResponse;
+
   try {
     await connectMongoDB();
     const users = await User.find();
     if (users.length === 0) {
-      const response = new Response(JSON.stringify({ message: "No users found" }), { status: 404 });
-      response.headers.set('Content-Type', 'application/json');
-      // Set CORS headers
-      Object.keys(headers).forEach(key => response.headers.set(key, headers[key]));
-      return response;
+      response = new NextResponse(JSON.stringify({ message: "No users found" }), { status: 404 });
+    } else {
+      response = new NextResponse(JSON.stringify(users), { status: 200 });
     }
-
-    const response = new Response(JSON.stringify(users), { status: 200 });
-    response.headers.set('Content-Type', 'application/json');
-    // Set CORS headers
-    Object.keys(headers).forEach(key => response.headers.set(key, headers[key]));
-    return response;
   } catch (error) {
     console.error("Error:", error);
-    const response = new Response(JSON.stringify({ error: "Failed to fetch users" }), { status: 500 });
-    response.headers.set('Content-Type', 'application/json');
-    // Set CORS headers
-    Object.keys(headers).forEach(key => response.headers.set(key, headers[key]));
-    return response;
+    response = new NextResponse(JSON.stringify({ error: "Failed to fetch users" }), { status: 500 });
   }
+
+  setCorsHeaders(response);
+  return response;
 }
 
 export async function POST(req: NextRequest) {
-  // Create a new response object
-  let response = new NextResponse();
-
-  // Set CORS headers
-  Object.keys(headers).forEach((key) => {
-    response.headers.set(key, headers[key]);
-  });
+  let response: NextResponse;
 
   try {
     await connectMongoDB();
     const body = JSON.parse(await req.text());
-    const newUser = new User(body) as IUser; 
+    const newUser = new User(body) as IUser;
     await newUser.save();
-
-    // Set the response body and status code
-    response = NextResponse.json({ message: "User created successfully" }, { status: 201 });
+    response = new NextResponse(JSON.stringify({ message: "User created successfully" }), { status: 201 });
   } catch (error) {
     console.error("Error:", error);
-    // Set the error response body and status code
-    response = NextResponse.json({ error: "Failed to create user" }, { status: 500 });
+    response = new NextResponse(JSON.stringify({ error: "Failed to create user" }), { status: 500 });
   }
 
-  // Return the response with the headers already set
+  setCorsHeaders(response);
   return response;
 }
+
 
 // export async function GET(req: NextRequest, res: NextResponse) {
 //   // await cors(req, res);
